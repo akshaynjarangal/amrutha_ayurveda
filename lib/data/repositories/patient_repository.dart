@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:ayurveda/core/constants.dart';
 import 'package:ayurveda/data/models/branch_list_model.dart';
 import 'package:ayurveda/data/models/patient_list_model.dart';
+import 'package:ayurveda/data/models/treatments_list_model.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -13,6 +14,8 @@ abstract class PatientRepository {
   Future<Either<String, List<PatientListModel>>> get getPatientList;
 
   Future<Either<String, List<BranchListModel>>> get getBranchList;
+
+  Future<Either<String, List<TreatmentsListModel>>> get getTreatmentsList;
 }
 
 @LazySingleton(as: PatientRepository)
@@ -63,6 +66,36 @@ class PatientRepositoryImpl implements PatientRepository {
         final data = await compute(
           branchListModelFromJson,
           jsonEncode(decode["branches"]),
+        );
+        return right(data);
+      }
+      if (res.statusCode == 401) {
+        return left("Unauthorized request");
+      } else {
+        return left(res.body);
+      }
+    } catch (e) {
+      return left(e.toString());
+    }
+  }
+
+  @override
+  Future<Either<String, List<TreatmentsListModel>>>
+      get getTreatmentsList async {
+    try {
+      final token = await storage.read(key: "token");
+      final url = Uri.https(AppUrls.domain, AppUrls.treatmentsListEndPoint);
+      final res = await http.get(
+        url,
+        headers: {
+          "Authorization": "Bearer $token",
+        },
+      );
+      if (res.statusCode == 200) {
+        final decode = jsonDecode(res.body);
+        final data = await compute(
+          treatmentsListModelFromJson,
+          jsonEncode(decode["treatments"]),
         );
         return right(data);
       }

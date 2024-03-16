@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:ayurveda/core/utils/app_colors.dart';
 import 'package:ayurveda/presentation/provider/patient_provider.dart';
+import 'package:ayurveda/presentation/provider/registration_provider.dart';
 import 'package:ayurveda/presentation/screens/home_screen.dart';
 import 'package:ayurveda/presentation/screens/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,13 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Amrutha Ayurveda',
         theme: ThemeData(
+          datePickerTheme: DatePickerThemeData(
+            backgroundColor: AppColors.white,
+            inputDecorationTheme: InputDecorationTheme(
+              labelStyle: GoogleFonts.poppins(),
+              hintStyle: GoogleFonts.poppins(),
+            ),
+          ),
           indicatorColor: AppColors.primaryColor,
           progressIndicatorTheme: ProgressIndicatorThemeData(
             color: AppColors.primaryColor,
@@ -67,7 +75,10 @@ class MyApp extends StatelessWidget {
                 child: const HomeScreen(),
               ),
           '/login': (context) => const LoginScreen(),
-          '/registration': (context) => const RegistrationScreen(),
+          '/registration': (context) => ChangeNotifierProvider.value(
+                value: getIt<RegistrationProvider>()..fetchBranches()..fetchTreatment(),
+                child: const RegistrationScreen(),
+              ),
         },
       ),
     );
