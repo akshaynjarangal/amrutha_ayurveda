@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:ayurveda/core/constants.dart';
 import 'package:ayurveda/domain/usecases/login_usecase.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
-class LoginProvider with ChangeNotifier {
+class LoginProvider extends ChangeNotifier {
   final LoginUsecase _loginUsecase;
   LoginProvider({required LoginUsecase loginUsecase}) : _loginUsecase = loginUsecase;
 
@@ -34,9 +34,12 @@ class LoginProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> login({required String username, required String password}) async {
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  Future<void> login() async {
     isLoading = true;
-    final result = await _loginUsecase.userLogin(username: username, password: password);
+    final result = await _loginUsecase.userLogin(username: usernameController.text, password: passwordController.text);
     result.fold((l) {
       isLoading = false;
       log("Error: $l");
@@ -48,6 +51,7 @@ class LoginProvider with ChangeNotifier {
         isLogin = true;
       }else{
       errorMessage = data["message"];
+      isLoading = false;
       log("Success: $r");
       }
     });
