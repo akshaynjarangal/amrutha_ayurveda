@@ -1,13 +1,13 @@
 import 'dart:developer';
 
+import 'package:ayurveda/core/constants.dart';
 import 'package:ayurveda/data/entities/treatment_entity.dart';
 import 'package:ayurveda/data/models/branch_list_model.dart';
 import 'package:ayurveda/data/models/treatments_list_model.dart';
 import 'package:ayurveda/domain/usecases/patient_usecase.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:injectable/injectable.dart';
+import 'package:intl/intl.dart';
 
 @injectable
 class RegistrationProvider extends ChangeNotifier {
@@ -155,10 +155,15 @@ class RegistrationProvider extends ChangeNotifier {
             id: _selectedTreatment!.id!,
             maleCount: maleCount,
             femaleCount: femaleCount,
+            price: _selectedTreatment!.price!,
           ),
         );
+        totalAmountController.text = _selectedTreatments
+            .map((e) => e.totalAmount)
+            .reduce((value, element) => value + element)
+            .toString();
         notifyListeners();
-      }else{
+      } else {
         removeFromSelectedTreatments = list.first;
         _selectedTreatments.add(
           TreatmentEntity(
@@ -166,8 +171,13 @@ class RegistrationProvider extends ChangeNotifier {
             id: _selectedTreatment!.id!,
             maleCount: maleCount,
             femaleCount: femaleCount,
+            price: _selectedTreatment!.price!,
           ),
         );
+        totalAmountController.text = _selectedTreatments
+            .map((e) => e.totalAmount)
+            .reduce((value, element) => value + element)
+            .toString();
         notifyListeners();
       }
     }
@@ -211,14 +221,99 @@ class RegistrationProvider extends ChangeNotifier {
   TextEditingController advanceController = TextEditingController();
   TextEditingController balanceController = TextEditingController();
   TextEditingController treatmentDate = TextEditingController();
-  TextEditingController treatmentTime = TextEditingController();
+  TextEditingController treatmentTimeHr = TextEditingController();
+  TextEditingController treatmentTimeMin = TextEditingController();
+
+  int? _selectedBranchId;
+
+  int? get selectedBranchId => _selectedBranchId;
+
+  set setBranchId(int value) {
+    _selectedBranchId = value;
+    notifyListeners();
+  }
 
   void calculateBalance() {
-    final totalAmount = double.parse(totalAmountController.text);
-    final discount = double.parse(discountController.text);
-    final advance = double.parse(advanceController.text);
+    final totalAmount = num.parse(
+      totalAmountController.text.isEmpty ? "0" : totalAmountController.text,
+    );
+    final discount = num.parse(
+      discountController.text.isEmpty ? "0" : discountController.text,
+    );
+    final advance = num.parse(
+      advanceController.text.isEmpty ? "0" : advanceController.text,
+    );
     final balance = totalAmount - discount - advance;
     balanceController.text = balance.toString();
     notifyListeners();
+  }
+
+  DateTime? _selectedTreatmentDate;
+  DateTime? get selectedTreatmentDate => _selectedTreatmentDate;
+
+  set changeDateSelection(DateTime date) {
+    _selectedTreatmentDate = date;
+    treatmentDate.text = DateFormat("dd/MM/yyyy").format(date);
+    notifyListeners();
+  }
+
+  TimeOfDay _selectedTime = TimeOfDay.now();
+  TimeOfDay get selectedTime => _selectedTime;
+
+  set changeTimeSelection(TimeOfDay time) {
+    _selectedTime = time;
+    treatmentTimeHr.text = time.hour.toString();
+    treatmentTimeMin.text = time.minute.toString();
+    //DateFormat("hh:mm a").format(DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day,time.hour,time.minute));
+    notifyListeners();
+  }
+
+  bool _isSuccess = false;
+  bool get isSuccess => _isSuccess;
+
+  set isSuccess(bool value) {
+    _isSuccess = value;
+    notifyListeners();
+  }
+
+  Future<void> saveRegistration() async {
+    isLoading = true;
+    final name = await storage.read(key: "name");
+    final Map<String, dynamic> data = {
+      "name": nameController.text,
+      "excecutive": name,
+      "payment": paymentType,
+      "phone": whatsappController.text,
+      "address": "${addressController.text},${discountController.text}",
+      "total_amount": totalAmountController.text,
+      "discount_amount": discountController.text,
+      "advance_amount": advanceController.text,
+      "balance_amount": balanceController.text,
+      "date_nd_time":
+          "${DateFormat("dd/MM/yyyy").format(selectedTreatmentDate ?? DateTime.now())}-${selectedTime.hourOfPeriod}:${selectedTime.minute} ${selectedTime.period.name.toUpperCase()}",
+      "id": "",
+      "male": (_selectedTreatments.where((element) => element.maleCount > 0).toList().isEmpty)?
+          "" : _selectedTreatments
+          .map((e) => "${e.id}")
+          .toList()
+          .join(","),
+      "female": (_selectedTreatments.where((element) => element.femaleCount > 0).toList().isEmpty)?
+          "" : _selectedTreatments
+          .map((e) => "${e.id}")
+          .toList()
+          .join(","),
+      "branch": "$selectedBranchId",
+      "treatments": _selectedTreatments.map((e) => "${e.id}").toList().join(","),
+    };
+    final res = await _patientUseCase.postPatientData(data: data);
+    res.fold((l) {
+      isSuccess = false;
+      isLoading = false;
+      log("Error: $l");
+    }, (r) {
+      isSuccess = true;
+      isLoading = false;
+      log("Success: $r");
+    });
   }
 }

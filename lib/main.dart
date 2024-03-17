@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:ayurveda/core/utils/app_colors.dart';
+import 'package:ayurveda/presentation/provider/login_provider.dart';
 import 'package:ayurveda/presentation/provider/patient_provider.dart';
 import 'package:ayurveda/presentation/provider/registration_provider.dart';
 import 'package:ayurveda/presentation/screens/home_screen.dart';
@@ -68,16 +69,21 @@ class MyApp extends StatelessWidget {
           textTheme: GoogleFonts.poppinsTextTheme(),
           useMaterial3: true,
         ),
-        initialRoute: isLogin ? '/' : '/login',
+        initialRoute: (isLogin) ? '/home' : '/login',
         routes: {
-          '/': (context) => ChangeNotifierProvider.value(
+          '/home': (context) => ChangeNotifierProvider.value(
                 value: getIt<PatientProvider>()..fetchPatients(),
                 child: const HomeScreen(),
               ),
-          '/login': (context) => const LoginScreen(),
+          '/login': (context) => ChangeNotifierProvider(
+                create: (context) => getIt<LoginProvider>(),
+                child: const LoginScreen(),
+              ),
           '/registration': (context) => ChangeNotifierProvider.value(
-                value: getIt<RegistrationProvider>()..fetchBranches()..fetchTreatment(),
-                child: const RegistrationScreen(),
+                value: getIt<RegistrationProvider>()
+                  ..fetchBranches()
+                  ..fetchTreatment(),
+                child: RegistrationScreen(),
               ),
         },
       ),

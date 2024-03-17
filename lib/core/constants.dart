@@ -8,6 +8,7 @@ class AppUrls {
   static const String patientListEndPoint = "$basePath/PatientList";
   static const String branchListEndPoint = "$basePath/BranchList";
   static const String treatmentsListEndPoint = "$basePath/TreatmentList";
+  static const String patientUpdateEndPoint = "$basePath/PatientUpdate";
 }
 
 const storage = FlutterSecureStorage();

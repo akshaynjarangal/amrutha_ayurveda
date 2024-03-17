@@ -47,6 +47,7 @@ class LoginProvider extends ChangeNotifier {
       final data = jsonDecode(r);
       if(data["status"] == true){
         await storage.write(key: "token", value: "${data["token"]}");
+        await storage.write(key: "name", value: "${data["user_details"]["name"]}");
         isLoading = false;
         isLogin = true;
       }else{

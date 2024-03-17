@@ -1,3 +1,4 @@
+import 'package:ayurveda/core/constants.dart';
 import 'package:ayurveda/core/utils/app_colors.dart';
 import 'package:ayurveda/presentation/provider/login_provider.dart';
 import 'package:ayurveda/presentation/widgets/app_space_widget.dart';
@@ -5,7 +6,6 @@ import 'package:ayurveda/presentation/widgets/input_decoration_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -70,15 +70,19 @@ class LoginScreen extends StatelessWidget {
                         if (value == null || value.trim().isEmpty) {
                           return 'Please enter your username';
                         }
-                        if(value.length<3){
+                        if (value.length < 3) {
                           return 'Please enter a valid username';
                         }
                         return null;
                       },
-                      controller: context.watch<LoginProvider>().usernameController,
+                      controller:
+                          context.watch<LoginProvider>().usernameController,
                       textInputAction: TextInputAction.next,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: inputDecoration(context,hintText: "Enter your email"),
+                      decoration: inputDecoration(
+                        context,
+                        hintText: "Enter your email",
+                      ),
                     ),
                     setHeight(16),
                     const Padding(
@@ -91,45 +95,61 @@ class LoginScreen extends StatelessWidget {
                         if (value == null || value.trim().isEmpty) {
                           return 'Please enter your password';
                         }
-                        if(value.length<6){
+                        if (value.length < 6) {
                           return 'Please enter a valid password';
                         }
                         return null;
                       },
-                      controller: context.watch<LoginProvider>().passwordController,
+                      controller:
+                          context.watch<LoginProvider>().passwordController,
                       textInputAction: TextInputAction.done,
                       keyboardType: TextInputType.visiblePassword,
                       obscureText: true,
-                      decoration:
-                          inputDecoration(context,hintText: "Enter your password"),
+                      decoration: inputDecoration(
+                        context,
+                        hintText: "Enter your password",
+                      ),
                     ),
                     setHeight(64),
                     Consumer<LoginProvider>(
-                      builder: (context,snapshot,_) {
-                        if(snapshot.errorMessage.isNotEmpty){
+                      builder: (context, snapshot, _) {
+                        if (snapshot.errorMessage.isNotEmpty) {
                           SchedulerBinding.instance.addPostFrameCallback((_) {
-                            ScaffoldMessenger.of(context)..hideCurrentSnackBar()..showSnackBar(SnackBar(
-                              backgroundColor: Colors.red,
-                              content: Text(snapshot.errorMessage),),);
+                            ScaffoldMessenger.of(context)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(
+                                  backgroundColor: Colors.red,
+                                  content: Text(snapshot.errorMessage),
+                                ),
+                              );
                             snapshot.errorMessage = "";
                           });
-
                         }
-                        if(snapshot.isLogin){
+                        if (snapshot.isLogin) {
                           SchedulerBinding.instance.addPostFrameCallback((_) {
-                            GoRouter.of(context).goNamed('home');
+                            kNavigationKey.currentState
+                                ?.pushNamedAndRemoveUntil(
+                              '/home',
+                              (route) => false,
+                            );
                           });
                         }
                         return ElevatedButton(
                           onPressed: () {
-                            if(formKey.currentState!.validate()){
+                            if (formKey.currentState!.validate()) {
                               context.read<LoginProvider>().login();
                             }
                           },
-                          child: snapshot.isLoading?const CircularProgressIndicator(strokeWidth: 2,): const Text(
-                            "Login",
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
+                          child: snapshot.isLoading
+                              ? CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.white,
+                                )
+                              : const Text(
+                                  "Login",
+                                  style: TextStyle(fontWeight: FontWeight.w600),
+                                ),
                         );
                       },
                     ),
@@ -148,11 +168,13 @@ class LoginScreen extends StatelessWidget {
                           children: [
                             TextSpan(
                               text: " Terms and Conditions",
-                              style:
-                                  Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        fontWeight: FontWeight.w100,
-                                        color: AppColors.linkColor,
-                                      ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w100,
+                                    color: AppColors.linkColor,
+                                  ),
                               children: [
                                 TextSpan(
                                   text: " and",

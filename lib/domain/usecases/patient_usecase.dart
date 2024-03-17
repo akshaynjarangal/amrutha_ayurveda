@@ -22,4 +22,8 @@ class PatientUseCase {
   Future<Either<String, List<TreatmentsListModel>>> get getTreatments async {
     return await _patientRepository.getTreatmentsList;
   }
+
+  Future<Either<String, String>> postPatientData({required Map<String, dynamic> data}) async {
+    return await _patientRepository.postPatientData(data: data);
+  }
 }

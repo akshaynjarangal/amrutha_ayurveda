@@ -16,6 +16,10 @@ abstract class PatientRepository {
   Future<Either<String, List<BranchListModel>>> get getBranchList;
 
   Future<Either<String, List<TreatmentsListModel>>> get getTreatmentsList;
+
+  Future<Either<String, String>> postPatientData({
+    required Map<String, dynamic> data,
+  });
 }
 
 @LazySingleton(as: PatientRepository)
@@ -63,6 +67,7 @@ class PatientRepositoryImpl implements PatientRepository {
       );
       if (res.statusCode == 200) {
         final decode = jsonDecode(res.body);
+        log("Branch --> ${res.body}");
         final data = await compute(
           branchListModelFromJson,
           jsonEncode(decode["branches"]),
@@ -93,6 +98,7 @@ class PatientRepositoryImpl implements PatientRepository {
       );
       if (res.statusCode == 200) {
         final decode = jsonDecode(res.body);
+        log("TREATMENT--> ${res.body}");
         final data = await compute(
           treatmentsListModelFromJson,
           jsonEncode(decode["treatments"]),
@@ -103,6 +109,39 @@ class PatientRepositoryImpl implements PatientRepository {
         return left("Unauthorized request");
       } else {
         return left(res.body);
+      }
+    } catch (e) {
+      return left(e.toString());
+    }
+  }
+
+  @override
+  Future<Either<String, String>> postPatientData({
+    required Map<String, dynamic> data,
+  }) async {
+    try {
+      final token = await storage.read(key: "token");
+      final url = Uri.https(AppUrls.domain, AppUrls.patientUpdateEndPoint);
+      log("Patient Data --> ${jsonEncode(data)}");
+      final res = await http.post(
+        url,
+        body: data,
+        headers: {
+          "Authorization": "Bearer $token",
+        },
+      );
+      if (res.statusCode == 200) {
+        log("Patient Data --> ${res.body}");
+        final decoded = jsonDecode(res.body);
+        if (decoded["status"] == true) {
+          return right("Patient data updated successfully");
+        } else {
+          return left("Error occured while updating patient data");
+        }
+      } else {
+        return left(
+          "Error occured while updating patient data : ${res.statusCode}",
+        );
       }
     } catch (e) {
       return left(e.toString());
