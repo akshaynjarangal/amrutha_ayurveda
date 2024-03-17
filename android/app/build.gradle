@@ -31,7 +31,7 @@ def keystoreProperties = new Properties()
 android {
     namespace "in.noviindus.ayurveda"
     compileSdk 34
-    ndkVersion flutter.ndkVersion
+    ndkVersion "25.1.8937393"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -106,4 +106,5 @@ flutter {
 
 dependencies {
     implementation 'com.google.android.material:material:1.11.0'
+    implementation 'javax.annotation:jsr250-api:1.0'
 }
