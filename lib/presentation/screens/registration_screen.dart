@@ -162,7 +162,7 @@ class RegistrationScreen extends StatelessWidget {
                           inputDecorationTheme: dropDownDecoration(),
                           menuStyle: MenuStyle(
                             backgroundColor:
-                                MaterialStatePropertyAll(AppColors.white),
+                                WidgetStatePropertyAll(AppColors.white),
                           ),
                         );
                       },
@@ -202,7 +202,7 @@ class RegistrationScreen extends StatelessWidget {
                           inputDecorationTheme: dropDownDecoration(),
                           menuStyle: MenuStyle(
                             backgroundColor:
-                                MaterialStatePropertyAll(AppColors.white),
+                                WidgetStatePropertyAll(AppColors.white),
                           ),
                         );
                       },
@@ -706,7 +706,8 @@ class RegistrationScreen extends StatelessWidget {
                                     patient.fetchPatients().then((value) async {
                                       state.isLoading = false;
                                       state.isSuccess = false;
-                                      await showGeneralDialog(
+                                      if(context.mounted){
+                                        await showGeneralDialog(
                                         context: context,
                                         pageBuilder: (
                                           context,
@@ -784,6 +785,7 @@ class RegistrationScreen extends StatelessWidget {
                                           );
                                         },
                                       );
+                                      }
                                     });
                                   }
                                 });
@@ -1479,7 +1481,7 @@ class RegistrationScreen extends StatelessWidget {
                       ),
                       inputDecorationTheme: dropDownDecoration(),
                       menuStyle: MenuStyle(
-                        backgroundColor: MaterialStatePropertyAll(
+                        backgroundColor: WidgetStatePropertyAll(
                           AppColors.white,
                         ),
                       ),

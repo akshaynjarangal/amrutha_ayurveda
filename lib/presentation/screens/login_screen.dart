@@ -211,3 +211,28 @@ class LoginScreen extends StatelessWidget {
     );
   }
 }
+
+Widget contains(){
+  return Container(
+    margin: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      border: Border.all(
+        color: Colors.black.withOpacity(0.2),
+        width: 1,
+      ),
+    ),
+    padding: const EdgeInsets.all(16),
+    child: const Column(
+      children: [
+        Text("Hello"),
+        Row(
+          children: [
+            Expanded(child: Text("Rate")),
+            Expanded(child: Text("1000")),
+          ],
+        ),
+      ],
+    ),
+  );
+}
